@@ -5,6 +5,9 @@ except ImportError:
     import json
 
 class MailSnake(object):
+    dc = 'us1'
+    base_api_url = 'https://%(dc)s.api.mailchimp.com/1.3/?method=%(method)s&output=%(format)s'
+
     def __init__(self, apikey = '', extra_params = {}):
         """
             Cache API key and address.
@@ -14,13 +17,11 @@ class MailSnake(object):
         self.default_params = {'apikey':apikey}
         self.default_params.update(extra_params)
 
-        dc = 'us1'
         if '-' in self.apikey:
-            dc = self.apikey.split('-')[1]
-        self.base_api_url = 'https://%s.api.mailchimp.com/1.3/?method=' % dc
+            self.dc = self.apikey.split('-')[1]
 
     def call(self, method, params = {}):
-        url = self.base_api_url + method
+        url = self.base_api_url % {'dc':self.dc, 'format':'json', 'method':method}
         params.update(self.default_params)
 
         post_data = json.dumps(params)
@@ -39,3 +40,5 @@ class MailSnake(object):
 
         return get.__get__(self)
 
+class MailSnakeSTS(MailSnake):
+    base_api_url_template = 'https://%(dc)s.sts.mailchimp.com/1.0/%(method)s%(format)s/'
