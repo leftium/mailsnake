@@ -16,7 +16,8 @@ CLASSIFIERS = [
 KEYWORDS = 'mailchimp api wrapper 1.3'
 
 
-setup(name = 'mailsnake',
+setup(
+    name = 'mailsnake',
     version = mailsnake.__version__,
     description = """MailChimp API v1.3 wrapper for Python.""",
     author = mailsnake.__author__,
@@ -26,4 +27,5 @@ setup(name = 'mailsnake',
     classifiers = CLASSIFIERS,
     keywords = KEYWORDS,
     zip_safe = True,
+    install_requires = ['requests'],
 )
