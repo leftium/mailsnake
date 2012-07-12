@@ -68,7 +68,7 @@ class MailSnake(object):
         else:
             api = self.api.capitalize() + ' API'
 
-        return u'<MailSnake %s: %s>' % (api, self.apikey)
+        return '<MailSnake %s: %s>' % (api, self.apikey)
 
     def call(self, method, params=None):
         url = self.api_url
