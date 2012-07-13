@@ -1,4 +1,4 @@
-from mailsnake import *
+from .mailsnake import *
 
 __author__ = 'John-Kim Murphy'
 __credits__ = [
@@ -10,3 +10,5 @@ __credits__ = [
     'Brad Pitcher'
 ]
 __version__ = '1.5.0'
+
+__all__ = ['MailSnake']
