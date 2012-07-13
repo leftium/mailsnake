@@ -13,14 +13,14 @@ elif _ver[0] == 3:
 
 setup(
     name='mailsnake',
-    version='1.5.0',
+    version='1.6.0',
     description='MailChimp API v1.3, STS, Export, Mandrill wrapper for Python.',
     long_description=open('README.rst').read(),
     author='John-Kim Murphy',
     url='https://github.com/michaelhelmick/python-mailsnake',
     packages=find_packages(),
     download_url='http://pypi.python.org/pypi/mailsnake/',
-    keywords='mailsnake mailchimp api wrapper export mandrill sts 1.3',
+    keywords='mailsnake mailchimp api wrapper export mandrill sts 1.3 p3k',
     zip_safe=True,
     install_requires=dep,
     py_modules=['mailsnake'],

@@ -2,7 +2,7 @@ MailSnake
 =========
 
 `MailSnake` is a Python wrapper for MailChimp's The API, STS API, Export API, and the
-new Mandrill API.
+new Mandrill API. (Now with support for Python 3)
 
 Installation
 ------------

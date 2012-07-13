@@ -9,6 +9,6 @@ __credits__ = [
     'Ryan Tucker',
     'Brad Pitcher'
 ]
-__version__ = '1.5.0'
+__version__ = '1.6.0'
 
 __all__ = ['MailSnake']
