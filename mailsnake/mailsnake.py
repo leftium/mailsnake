@@ -105,7 +105,7 @@ class MailSnake(object):
             raise HTTPRequestException(req.status_code)
 
         try:
-            if self.api == 'export':
+            if self.api == 'export' and req.text.find('\n') > -1:
                 rsp = [json.loads(i) for i in \
                       req.text.split('\n')[0:-1]]
             else:
