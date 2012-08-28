@@ -1,5 +1,5 @@
 """ MailSnake """
-
+import collections
 import requests
 from requests.compat import basestring
 
@@ -95,7 +95,8 @@ class MailSnake(object):
 
         try:
             if self.api == 'export':
-                req = requests.post(url, params=data, headers=headers)
+                req = requests.post(
+                    url, params=flatten_data(data), headers=headers)
             else:
                 req = requests.post(url, data=data, headers=headers)
         except requests.exceptions.RequestException as e:
@@ -106,8 +107,7 @@ class MailSnake(object):
 
         try:
             if self.api == 'export' and req.text.find('\n') > -1:
-                rsp = [json.loads(i) for i in \
-                      req.text.split('\n')[0:-1]]
+                rsp = [json.loads(i) for i in req.text.split('\n')[0:-1]]
             else:
                 rsp = json.loads(req.text)
         except ValueError as e:
@@ -131,3 +131,18 @@ class MailSnake(object):
             return self.call(method_name.replace('_', '-'), params)
 
         return get.__get__(self)
+
+def flatten_data(data, parent_key=''):
+    items = []
+    for k, v in data.items():
+        new_key = ('%s[%s]' % (parent_key, k)) if parent_key else k
+        if isinstance(v, collections.MutableMapping):
+            items.extend(flatten_data(v, new_key).items())
+        elif isinstance(v, collections.MutableSequence):
+            new_v = []
+            for v_item in v:
+                new_v.append((len(new_v), v_item))
+            items.extend(flatten_data(dict(new_v), new_key).items())
+        else:
+            items.append((new_key, v))
+    return dict(items)
