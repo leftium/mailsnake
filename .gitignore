@@ -4,3 +4,4 @@ dist/
 *.egg-info
 *~
 *.geany
+secret_keys.py
