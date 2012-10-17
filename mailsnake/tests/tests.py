@@ -41,8 +41,8 @@ class TestMailChimpAPI(unittest.TestCase):
     def test_lists(self):
         lists = self.mcapi.lists()
         assert isinstance(lists, dict)
-        assert lists.has_key('total')
-        assert lists.has_key('data')
+        assert 'total' in lists
+        assert 'data' in lists
 
     def test_listActivity(self):
         activity = self.mcapi.listActivity(id=MAILCHIMP_LIST_ID)
@@ -54,7 +54,7 @@ class TestMailChimpAPI(unittest.TestCase):
         types = {'user': False, 'gallery': False, 'base': False}
         for t_type in types:
             new_types = dict(types.items() + {t_type: True}.items())
-            assert self.mcapi.templates(types=new_types).has_key(t_type)
+            assert t_type in self.mcapi.templates(types=new_types)
 
     def test_templateAddDel(self):
         templates = self.mcapi.templates(inactives={'include': True})
