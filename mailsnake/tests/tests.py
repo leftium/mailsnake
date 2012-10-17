@@ -4,6 +4,20 @@ from collections import MutableSequence
 from mailsnake import MailSnake
 from .secret_keys import MAILCHIMP_API_KEY, MAILCHIMP_LIST_ID
 
+"""
+To run these tests, do the following:
+- Place a file called secret_keys.py under the mailsnake directory
+  containing the following mailchimp keys:
+  * MAILCHIMP_API_KEY
+  * MAILCHIMP_LIST_ID
+  You must create a test list in MailChimp and get the ID for use here
+  because the API does not have a method for creating lists.
+
+- Install the python 'nose' library
+- From the command-line, run 'nosetests'
+"""
+
+
 class TestMailChimpAPI(unittest.TestCase):
     def setUp(self):
         self.mcapi = MailSnake(MAILCHIMP_API_KEY)
