@@ -2,11 +2,13 @@ import unittest
 
 from collections import MutableSequence
 from mailsnake import MailSnake
-from .secret_keys import MAILCHIMP_API_KEY
+from .secret_keys import MAILCHIMP_API_KEY, MAILCHIMP_LIST_ID
 
 class TestMailChimpAPI(unittest.TestCase):
     def setUp(self):
         self.mcapi = MailSnake(MAILCHIMP_API_KEY)
+
+    # Helper Methods
 
     def test_ping(self):
         assert self.mcapi.ping() == "Everything's Chimpy!"
@@ -19,6 +21,20 @@ class TestMailChimpAPI(unittest.TestCase):
         if len(chimp_chatter) > 0:
             assert 'message' in chimp_chatter[0].keys()
             assert chimp_chatter[0]['url'].find('mailchimp') > -1
+
+    # List Related Methods
+
+    def test_lists(self):
+        lists = self.mcapi.lists()
+        assert isinstance(lists, dict)
+        assert lists.has_key('total')
+        assert lists.has_key('data')
+
+    def test_listActivity(self):
+        activity = self.mcapi.listActivity(id=MAILCHIMP_LIST_ID)
+        assert isinstance(activity, list)
+
+    # Template Related Methods
 
     def test_templates(self):
         types = {'user': False, 'gallery': False, 'base': False}
