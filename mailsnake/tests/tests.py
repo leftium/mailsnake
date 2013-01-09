@@ -20,10 +20,25 @@ To run these tests, do the following:
 """
 
 
-class TestMailChimpAPI(unittest.TestCase):
+class TestMailChimp(unittest.TestCase):
     def setUp(self):
         self.mcapi = MailSnake(MAILCHIMP_API_KEY)
+        self.mcapi.listBatchUnsubscribe(
+            id=MAILCHIMP_LIST_ID, emails=[TEST_EMAIL], delete_member=False,
+            send_goodbye=False, send_notify=False)
 
+    def _subscribe(self, email=None):
+        return self.mcapi.listSubscribe(
+            id=MAILCHIMP_LIST_ID, email_address=email if email else TEST_EMAIL,
+            double_optin=False, send_welcome=False)
+
+    def _unsubscribe(self, email=None):
+        return self.mcapi.listUnsubscribe(
+            id=MAILCHIMP_LIST_ID, email_address=email if email else TEST_EMAIL,
+            send_goodbye=False, send_notify=False)
+
+
+class TestMailChimpAPI(TestMailChimp):
     # Helper Methods
 
     def test_ping(self):
@@ -80,12 +95,8 @@ class TestMailChimpAPI(unittest.TestCase):
         assert isinstance(activity, list)
 
     def test_listSubscribeUnsubscribe(self):
-        assert self.mcapi.listSubscribe(
-            id=MAILCHIMP_LIST_ID, email_address=TEST_EMAIL, double_optin=False,
-            send_welcome=False)
-        assert self.mcapi.listUnsubscribe(
-            id=MAILCHIMP_LIST_ID, email_address=TEST_EMAIL, send_goodbye=False,
-            send_notify=False)
+        assert self._subscribe()
+        assert self._unsubscribe()
 
     # Template Related Methods
 
@@ -111,3 +122,24 @@ class TestMailChimpAPI(unittest.TestCase):
             index += 1
             template_name = '%s%i' % (base_name, index)
         return self.mcapi.templateAdd(name=template_name, html=html)
+
+
+class TestExportAPI(TestMailChimp):
+    def setUp(self):
+        super(TestExportAPI, self).setUp()
+        self.export = MailSnake(MAILCHIMP_API_KEY, api='export')
+        self.export_stream = MailSnake(MAILCHIMP_API_KEY, api='export',
+                                       requests_opts={'prefetch': False})
+
+    def test_list(self):
+        member_list = self.export.list(id=MAILCHIMP_LIST_ID)
+        assert len(member_list) == 1
+        self._subscribe()
+        member_list = self.export.list(id=MAILCHIMP_LIST_ID)
+        assert len(member_list) == 2
+        member_list = self.export_stream.list(id=MAILCHIMP_LIST_ID)
+        lines = 0
+        for list_member in member_list():
+            if lines > 0:
+                assert isinstance(list_member, list)
+            lines += 1
