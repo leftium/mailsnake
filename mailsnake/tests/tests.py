@@ -4,7 +4,7 @@ from collections import MutableSequence
 from mailsnake import MailSnake
 from random import random
 
-from .secret_keys import MAILCHIMP_API_KEY, MAILCHIMP_LIST_ID
+from .secret_keys import MAILCHIMP_API_KEY, MAILCHIMP_LIST_ID, TEST_EMAIL
 
 """
 To run these tests, do the following:
@@ -78,6 +78,14 @@ class TestMailChimpAPI(unittest.TestCase):
     def test_listActivity(self):
         activity = self.mcapi.listActivity(id=MAILCHIMP_LIST_ID)
         assert isinstance(activity, list)
+
+    def test_listSubscribeUnsubscribe(self):
+        assert self.mcapi.listSubscribe(
+            id=MAILCHIMP_LIST_ID, email_address=TEST_EMAIL, double_optin=False,
+            send_welcome=False)
+        assert self.mcapi.listUnsubscribe(
+            id=MAILCHIMP_LIST_ID, email_address=TEST_EMAIL, send_goodbye=False,
+            send_notify=False)
 
     # Template Related Methods
 
