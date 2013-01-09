@@ -1,6 +1,7 @@
 """ MailSnake """
-
+import collections
 import requests
+import types
 from requests.compat import basestring
 
 try:
@@ -24,9 +25,11 @@ class MailSnake(object):
                  apikey='',
                  extra_params=None,
                  api='api',
-                 api_section=''):
-        """
-            Cache API key and address.
+                 api_section='',
+                 requests_opts={}):
+        """Cache API key and address. For additional control over how
+        requests are made, supply a dictionary for requests_opts. This will
+        be passed through to requests.post() as kwargs.
         """
         self.apikey = apikey
 
@@ -60,6 +63,12 @@ class MailSnake(object):
         }
         self.api_url = 'https://%s%s%s.com/%s' % api_info[api]
 
+        self.requests_opts = requests_opts
+        # Handle both prefetch=False (Requests < 1.0.0)
+        prefetch = requests_opts.get('prefetch', True)
+        # and stream=True (Requests >= 1.0.0) for response streaming
+        self.stream = requests_opts.get('stream', not prefetch)
+
     def __repr__(self):
         if self.api == 'api':
             api = 'API v3'
@@ -71,6 +80,11 @@ class MailSnake(object):
         return '<MailSnake %s: %s>' % (api, self.apikey)
 
     def call(self, method, params=None):
+        """Call the appropriate MailChimp API method with supplied
+        params. If response streaming is enabled, return a generator
+        that yields one line of deserialized JSON at a time, otherwise
+        simply deserialize and return the entire JSON response body.
+        """
         url = self.api_url
         if self.api == 'mandrill':
             url += (self.api_section + '/' + method + '.json')
@@ -95,9 +109,15 @@ class MailSnake(object):
 
         try:
             if self.api == 'export':
-                req = requests.post(url, params=data, headers=headers)
+                req = requests.post(url,
+                                    params=flatten_data(data),
+                                    headers=headers,
+                                    **self.requests_opts)
             else:
-                req = requests.post(url, data=data, headers=headers)
+                req = requests.post(url,
+                                    data=data,
+                                    headers=headers,
+                                    **self.requests_opts)
         except requests.exceptions.RequestException as e:
             raise HTTPRequestException(e.message)
 
@@ -105,16 +125,23 @@ class MailSnake(object):
             raise HTTPRequestException(req.status_code)
 
         try:
-            if self.api == 'export':
-                rsp = [json.loads(i) for i in \
-                      req.text.split('\n')[0:-1]]
+            if self.stream:
+                def stream():
+                    for line in req.iter_lines():
+                        # Handle byte arrays in Python 3
+                        line = line.decode('utf-8')
+                        if line:
+                            yield json.loads(line)
+                rsp = stream
+            elif self.api == 'export' and req.text.find('\n') > -1:
+                rsp = [json.loads(i) for i in req.text.split('\n')[0:-1]]
             else:
                 rsp = json.loads(req.text)
         except ValueError as e:
             raise ParseException(e.message)
 
-        if not isinstance(rsp, (int, bool, basestring)) and \
-                'error' in rsp and 'code' in rsp:
+        types_ = int, bool, basestring, types.FunctionType
+        if not isinstance(rsp, types_) and 'error' in rsp and 'code' in rsp:
             try:
                 Err = exception_for_code(rsp['code'])
             except KeyError:
@@ -131,3 +158,18 @@ class MailSnake(object):
             return self.call(method_name.replace('_', '-'), params)
 
         return get.__get__(self)
+
+def flatten_data(data, parent_key=''):
+    items = []
+    for k, v in data.items():
+        new_key = ('%s[%s]' % (parent_key, k)) if parent_key else k
+        if isinstance(v, collections.MutableMapping):
+            items.extend(flatten_data(v, new_key).items())
+        elif isinstance(v, collections.MutableSequence):
+            new_v = []
+            for v_item in v:
+                new_v.append((len(new_v), v_item))
+            items.extend(flatten_data(dict(new_v), new_key).items())
+        else:
+            items.append((new_key, v))
+    return dict(items)

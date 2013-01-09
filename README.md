@@ -63,6 +63,41 @@ mapi = MailSnake('YOUR MANDRILL API KEY', api='mandrill')
 mapi.messages.send(message={'html':'email html', 'subject':'email subject', 'from_email':'from@example.com', 'from_name':'From Name', 'to':[{'email':'to@example.com', 'name':'To Name'}]}) # returns 'PONG!'
 ```
 
+Additional Request Options
+--------------------------
+
+MailSnake uses [Requests](http://docs.python-requests.org/en/v1.0.0/) for
+HTTP. If you require more control over how your request is made,
+you may supply a dictionary as the value of `requests_opts` when
+constructing an instance of `MailSnake`. This will be passed through (as
+kwargs) to `requests.post()`. See the next section for an example.
+
+Streamed Responses
+------------------
+
+Since responses from the MailChimp Export API can be quite large, it is
+helpful to be able to consume them in a streamed fashion. If you supply
+`requests_opts={'stream': True}` when calling MailSnake, a generator is
+returned that deserializes and yields each line of the streamed response
+as it arrives:
+
+```python
+from mailsnake import MailSnake
+
+opts = {'stream': True}
+export = MailSnake('YOURAPIKEY', api='export', requests_opts=opts)
+resp = export.list(id='YOURLISTID')
+
+lines = 0
+for list_member in resp():
+    if lines > 0: # skip header row
+        print list_member
+    lines += 1
+```
+
+If you are using Requests < 1.0.0, supply `{'prefetch': False}` instead of
+`{'stream': True}`.
+
 Note
 ----
 
