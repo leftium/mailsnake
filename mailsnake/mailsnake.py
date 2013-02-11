@@ -26,7 +26,8 @@ class MailSnake(object):
                  extra_params=None,
                  api='api',
                  api_section='',
-                 requests_opts={}):
+                 requests_opts={},
+                 dc=None):
         """Cache API key and address. For additional control over how
         requests are made, supply a dictionary for requests_opts. This will
         be passed through to requests.post() as kwargs.
@@ -53,7 +54,9 @@ class MailSnake(object):
                                               api, x))
         self.default_params.update(extra_params)
 
-        if '-' in self.apikey:
+        if dc:
+            self.dc = dc
+        elif '-' in self.apikey:
             self.dc = self.apikey.split('-')[1]
         api_info = {
             'api': (self.dc, '.api.', 'mailchimp', '1.3/?method='),
