@@ -38,6 +38,17 @@ class TestMailChimp(unittest.TestCase):
             id=MAILCHIMP_LIST_ID, email_address=email if email else TEST_EMAIL,
             send_goodbye=False, send_notify=False)
 
+    def _set_wrong_api_key(self, dc=True, reset=False):
+        fake_key = "THISISNOTANAPIKEY"
+        fake_key += MAILCHIMP_API_KEY.split('-')[1]
+        # If dc is true then add the datacenter provided by the MAILCHIMP_API_KEY variable
+        if reset:
+            fake_key = MAILCHIMP_API_KEY
+        elif dc:
+            fake_key += "-" + MAILCHIMP_API_KEY.split('-')[1]
+        print(fake_key)
+        # self.mcapi = MailSnake("THISISNOTANAPIKEY")
+
 
 class TestMailChimpAPI(TestMailChimp):
     # Helper Methods
@@ -113,7 +124,7 @@ class TestMailChimpAPI(TestMailChimp):
         assert self.mcapi.templateDel(id=template_id)
 
     def _add_test_template(self):
-        html = open('mailsnake/tests/template.html', 'r').read()
+        html = open('./template.html', 'r').read()
         templates = self.mcapi.templates(inactives={'include': True})
         template_names = [t['name'] for t in templates['user']]
         index = 0
@@ -130,7 +141,7 @@ class TestExportAPI(TestMailChimp):
         super(TestExportAPI, self).setUp()
         self.export = MailSnake(MAILCHIMP_API_KEY, api='export')
         self.export_stream = MailSnake(MAILCHIMP_API_KEY, api='export',
-                                       requests_opts={'prefetch': False})
+                                       requests_opts={'stream': True})
 
     def test_list(self):
         member_list = self.export.list(id=MAILCHIMP_LIST_ID)
