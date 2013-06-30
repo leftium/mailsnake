@@ -38,7 +38,6 @@ class TestMailChimp(unittest.TestCase):
             id=MAILCHIMP_LIST_ID, email_address=email if email else TEST_EMAIL,
             send_goodbye=False, send_notify=False)
 
-
 class TestMailChimpAPI(TestMailChimp):
     # Helper Methods
 
@@ -91,6 +90,15 @@ class TestMailChimpAPI(TestMailChimp):
         assert 'total' in lists
         assert 'data' in lists
 
+    def test_lists_exception(self):
+        # Set apikey to wrong apikey
+        self._set_wrong_api_key
+
+        self.assertRaises("Invalid Mailchimp API Key", self.mcapi.lists)
+
+        # Reset apikey to correct apikey
+        self._set_wrong_api_key(reset=True)
+
     def test_listActivity(self):
         activity = self.mcapi.listActivity(id=MAILCHIMP_LIST_ID)
         assert isinstance(activity, list)
@@ -113,7 +121,7 @@ class TestMailChimpAPI(TestMailChimp):
         assert self.mcapi.templateDel(id=template_id)
 
     def _add_test_template(self):
-        html = open('mailsnake/tests/template.html', 'r').read()
+        html = open('./template.html', 'r').read()
         templates = self.mcapi.templates(inactives={'include': True})
         template_names = [t['name'] for t in templates['user']]
         index = 0
@@ -130,7 +138,7 @@ class TestExportAPI(TestMailChimp):
         super(TestExportAPI, self).setUp()
         self.export = MailSnake(MAILCHIMP_API_KEY, api='export')
         self.export_stream = MailSnake(MAILCHIMP_API_KEY, api='export',
-                                       requests_opts={'prefetch': False})
+                                       requests_opts={'stream': True})
 
     def test_list(self):
         member_list = self.export.list(id=MAILCHIMP_LIST_ID)
