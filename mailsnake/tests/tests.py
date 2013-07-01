@@ -1,7 +1,7 @@
 import unittest
 
 from collections import MutableSequence
-from mailsnake import MailSnake
+from mailsnake import MailSnake, exceptions
 from random import random
 
 from .secret_keys import MAILCHIMP_API_KEY, MAILCHIMP_LIST_ID, TEST_EMAIL
@@ -37,6 +37,15 @@ class TestMailChimp(unittest.TestCase):
         return self.mcapi.listUnsubscribe(
             id=MAILCHIMP_LIST_ID, email_address=email if email else TEST_EMAIL,
             send_goodbye=False, send_notify=False)
+
+    def _set_api_key(self, apikey='', reset=False):
+
+        # If dc is true then add the datacenter provided by the MAILCHIMP_API_KEY variable
+        if reset is True:
+            apikey = MAILCHIMP_API_KEY
+
+        self.mcapi = MailSnake(apikey)
+
 
 class TestMailChimpAPI(TestMailChimp):
     # Helper Methods
@@ -91,13 +100,18 @@ class TestMailChimpAPI(TestMailChimp):
         assert 'data' in lists
 
     def test_lists_exception(self):
-        # Set apikey to wrong apikey
-        self._set_wrong_api_key
 
-        self.assertRaises("Invalid Mailchimp API Key", self.mcapi.lists)
+        # Test with key including dc
+        self._set_api_key("WRONGKEY-us1")
+        self.assertRaises(exceptions.InvalidApiKeyException, self.mcapi.lists)
 
-        # Reset apikey to correct apikey
-        self._set_wrong_api_key(reset=True)
+        # Test with key without dc
+        self._set_api_key("WRONGKEY")
+        self.assertRaises(exceptions.InvalidApiKeyException, self.mcapi.lists)
+
+
+        # Reset apikey to MAILCHIMP_API_KEY
+        self._set_api_key(reset=True)
 
     def test_listActivity(self):
         activity = self.mcapi.listActivity(id=MAILCHIMP_LIST_ID)
