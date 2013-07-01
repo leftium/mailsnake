@@ -63,6 +63,23 @@ mapi = MailSnake('YOUR MANDRILL API KEY', api='mandrill')
 mapi.messages.send(message={'html':'email html', 'subject':'email subject', 'from_email':'from@example.com', 'from_name':'From Name', 'to':[{'email':'to@example.com', 'name':'To Name'}]}) # returns 'PONG!'
 ```
 
+OAuth Tokens
+------------
+
+You can use a MailChimp OAuth token in place of an API key, but
+because MailChimp's tokens don't include the datacenter as a suffix,
+you must supply it yourself (substitute an actual number for X below):
+
+```python
+ms = MailSnake('A MAILCHIMP OAUTH TOKEN', dc='usX')
+ms.ping() # returns "Everything's Chimpy!" just like with an API key
+```
+
+If you completed the OAuth dance as described in the
+[MailChimp OAuth2 documentation](http://apidocs.mailchimp.com/oauth2/),
+you should have discovered the datacenter associated with the token
+when making the metadata request.
+
 Additional Request Options
 --------------------------
 

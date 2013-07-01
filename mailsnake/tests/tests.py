@@ -1,7 +1,7 @@
 import unittest
 
 from collections import MutableSequence
-from mailsnake import MailSnake
+from mailsnake import MailSnake, exceptions
 from random import random
 
 from .secret_keys import MAILCHIMP_API_KEY, MAILCHIMP_LIST_ID, TEST_EMAIL
@@ -37,6 +37,14 @@ class TestMailChimp(unittest.TestCase):
         return self.mcapi.listUnsubscribe(
             id=MAILCHIMP_LIST_ID, email_address=email if email else TEST_EMAIL,
             send_goodbye=False, send_notify=False)
+
+    def _set_api_key(self, apikey='', reset=False):
+
+        # If dc is true then add the datacenter provided by the MAILCHIMP_API_KEY variable
+        if reset is True:
+            apikey = MAILCHIMP_API_KEY
+
+        self.mcapi = MailSnake(apikey)
 
 
 class TestMailChimpAPI(TestMailChimp):
@@ -91,6 +99,20 @@ class TestMailChimpAPI(TestMailChimp):
         assert 'total' in lists
         assert 'data' in lists
 
+    def test_lists_exception(self):
+
+        # Test with key including dc
+        self._set_api_key("WRONGKEY-us1")
+        self.assertRaises(exceptions.InvalidApiKeyException, self.mcapi.lists)
+
+        # Test with key without dc
+        self._set_api_key("WRONGKEY")
+        self.assertRaises(exceptions.InvalidApiKeyException, self.mcapi.lists)
+
+
+        # Reset apikey to MAILCHIMP_API_KEY
+        self._set_api_key(reset=True)
+
     def test_listActivity(self):
         activity = self.mcapi.listActivity(id=MAILCHIMP_LIST_ID)
         assert isinstance(activity, list)
@@ -113,7 +135,7 @@ class TestMailChimpAPI(TestMailChimp):
         assert self.mcapi.templateDel(id=template_id)
 
     def _add_test_template(self):
-        html = open('mailsnake/tests/template.html', 'r').read()
+        html = open('./template.html', 'r').read()
         templates = self.mcapi.templates(inactives={'include': True})
         template_names = [t['name'] for t in templates['user']]
         index = 0
@@ -130,7 +152,7 @@ class TestExportAPI(TestMailChimp):
         super(TestExportAPI, self).setUp()
         self.export = MailSnake(MAILCHIMP_API_KEY, api='export')
         self.export_stream = MailSnake(MAILCHIMP_API_KEY, api='export',
-                                       requests_opts={'prefetch': False})
+                                       requests_opts={'stream': True})
 
     def test_list(self):
         member_list = self.export.list(id=MAILCHIMP_LIST_ID)
