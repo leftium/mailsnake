@@ -4,21 +4,7 @@ from collections import MutableSequence
 from mailsnake import MailSnake, exceptions
 from random import random
 
-from .secret_keys import MAILCHIMP_API_KEY, MAILCHIMP_LIST_ID, TEST_EMAIL
-
-"""
-To run these tests, do the following:
-- Place a file called secret_keys.py under the mailsnake directory
-  containing the following mailchimp related variables:
-  * MAILCHIMP_API_KEY
-  * MAILCHIMP_LIST_ID
-  * TEST_EMAIL (must be a valid email, i.e. not test@example.com)
-  You must create a test list in MailChimp and get the ID for use here
-  because the API does not have a method for creating lists.
-
-- Install the python 'nose' library
-- From the command-line, run 'nosetests'
-"""
+from .config import MAILCHIMP_API_KEY, MAILCHIMP_LIST_ID, TEST_EMAIL
 
 
 class TestMailChimp(unittest.TestCase):

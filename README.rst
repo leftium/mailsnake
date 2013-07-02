@@ -5,7 +5,8 @@ MailSnake
 
 Installation
 ------------
-::
+
+.. code-block::bash
 
     pip install mailsnake
 
@@ -15,7 +16,7 @@ Usage
 Basic Ping
 ~~~~~~~~~~
 
-::
+.. code-block::python
 
     from mailsnake import MailSnake
     from mailsnake.exceptions import *
@@ -29,7 +30,7 @@ Basic Ping
 Mandrill Ping
 ~~~~~~~~~~~~~
 
-::
+.. code-block::python
 
     mapi = MailSnake('YOUR MANDRILL API KEY', api='mandrill')
     mapi.users.ping() # returns "PONG!"
@@ -38,7 +39,7 @@ Mandrill Ping
 STS Example
 ~~~~~~~~~~~
 
-::
+.. code-block::python
 
     mcsts = MailSnake('YOUR MAILCHIMP API KEY', api='sts')
     mcsts.GetSendQuota() # returns something like {'Max24HourSend': '10000.0', 'SentLast24Hours': '0.0', 'MaxSendRate': '5.0'}
@@ -47,7 +48,7 @@ STS Example
 Catching Errors
 ~~~~~~~~~~~~~~~
 
-::
+.. code-block::python
 
     ms = MailSnake( 'my_wrong_mailchimp_api_key_that_does_not_exist')
     try:
@@ -60,6 +61,6 @@ Note
 
 API parameters must be passed by name. For example:
 
-::
+.. code-block::python
 
     ms.listMemberInfo(id='YOUR LIST ID', email_address='name@email.com')

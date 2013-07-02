@@ -1,28 +1,26 @@
 #!/usr/bin/env python
 
-import sys
-from setuptools import setup, find_packages
+from setuptools import setup
 
-# dep sugar.
-_ver = sys.version_info
+__author__ = 'John-Kim Murphy'
+__version__ = '2.0.0'
 
-if _ver[0] == 2:
-    dep = ['simplejson', 'requests']
-elif _ver[0] == 3:
-    dep = ['requests']
+packages = [
+    'mailsnake',
+]
 
 setup(
     name='mailsnake',
-    version='1.6.2',
+    version=__version__,
+    install_requires=['requests==1.2.3'],
+    author=__author__,
+    license=open('LICENSE').read(),
+    url='https://github.com/michaelhelmick/python-mailsnake',
+    keywords='mailsnake mailchimp api wrapper export mandrill sts 1.3 p3k',
     description='MailChimp API v1.3, STS, Export, Mandrill wrapper for Python.',
     long_description=open('README.rst').read(),
-    author='John-Kim Murphy',
-    url='https://github.com/michaelhelmick/python-mailsnake',
-    packages=find_packages(),
-    download_url='http://pypi.python.org/pypi/mailsnake/',
-    keywords='mailsnake mailchimp api wrapper export mandrill sts 1.3 p3k',
-    zip_safe=True,
-    install_requires=dep,
+    include_package_data=True,
+    packages=packages,
     py_modules=['mailsnake'],
     classifiers=[
         'Development Status :: 5 - Production/Stable',

@@ -1,33 +1,27 @@
-""" MailSnake """
-import collections
-import requests
-import types
-from requests.compat import basestring
+# -*- coding: utf-8 -*-
 
-try:
-    import simplejson as json
-except ImportError:
-    try:
-        import json
-    except ImportError:
-        try:
-            from django.utils import simplejson as json
-        except ImportError:
-            raise ImportError('A json library is required to use ' + \
-                             'this python library. Lol, yay for ' + \
-                             'being verbose. ;)')
+"""
+mailsnake.api
+~~~~~~~~~~~~~
+
+This module contains functionality for access to core Twitter API calls,
+Twitter Authentication, and miscellaneous methods that are useful when
+dealing with the Twitter API
+"""
+
+
+import requests
+from .compat import json, basestring
 
 from .exceptions import *
 
+import collections
+import types
+
 
 class MailSnake(object):
-    def __init__(self,
-                 apikey='',
-                 extra_params=None,
-                 api='api',
-                 api_section='',
-                 requests_opts={},
-                 dc=None):
+    def __init__(self, apikey='', extra_params=None, api='api', api_section='',
+                 requests_opts=None, dc=None):
         """Cache API key and address. For additional control over how
         requests are made, supply a dictionary for requests_opts. This will
         be passed through to requests.post() as kwargs.
@@ -51,7 +45,7 @@ class MailSnake(object):
                 for x in ['users', 'messages', 'tags', 'rejects',
                           'senders', 'urls', 'templates', 'webhooks']:
                     setattr(self, x, MailSnake(apikey, extra_params,
-                                              api, x))
+                                               api, x))
         self.default_params.update(extra_params)
 
         if dc:
@@ -66,11 +60,29 @@ class MailSnake(object):
         }
         self.api_url = 'https://%s%s%s.com/%s' % api_info[api]
 
-        self.requests_opts = requests_opts
-        # Handle both prefetch=False (Requests < 1.0.0)
-        prefetch = requests_opts.get('prefetch', True)
-        # and stream=True (Requests >= 1.0.0) for response streaming
-        self.stream = requests_opts.get('stream', not prefetch)
+        self.requests_opts = requests_opts or {}
+        default_headers = {'User-Agent': 'MailSnake v' + __version__}
+        if not 'headers' in self.requests_opts:
+            # If they didn't set any headers, set our defaults for them
+            self.requests_opts['headers'] = default_headers
+        elif 'User-Agent' not in self.requests_opts['headers']:
+            # If they set headers, but didn't include User-Agent.. set it for them
+            self.requests_opts['headers'].update(default_headers)
+
+        if self.api == 'api' or self.api == 'mandrill':
+            self.requests_opts['headers'].update({'content-type': 'application/json'})
+        else:
+            self.requests_opts['headers'].update({'content-type': 'application/x-www-form-urlencoded'})
+
+        self.client = requests.Session()
+        # Make a copy of the client args and iterate over them
+        # Pop out all the acceptable args at this point because they will
+        # Never be used again.
+        requests_opts_copy = self.requests_opts.copy()
+        for k, v in requests_opts_copy.items():
+            if k in ('cert', 'headers', 'hooks', 'max_redirects', 'proxies'):
+                setattr(self.client, k, v)
+                self.requests_opts.pop(k)  # Pop, pop!
 
     def __repr__(self):
         if self.api == 'api':
@@ -103,24 +115,21 @@ class MailSnake(object):
             data = json.dumps(params)
             if self.api == 'api':
                 data = requests.utils.quote(data)
-            headers = {'content-type':'application/json'}
+        elif self.api == 'export':
+            data = flatten_data(params)
         else:
             data = params
-            headers = {
-                'content-type': 'application/x-www-form-urlencoded'
-            }
 
         try:
-            if self.api == 'export':
-                req = requests.post(url,
-                                    params=flatten_data(data),
-                                    headers=headers,
-                                    **self.requests_opts)
-            else:
-                req = requests.post(url,
-                                    data=data,
-                                    headers=headers,
-                                    **self.requests_opts)
+            func = getattr(self.client, method)
+
+            requests_args = {}
+            for k, v in self.requests_opts.items():
+                # Maybe this should be set as a class variable and only done once?
+                if k in ('timeout', 'allow_redirects', 'stream', 'verify'):
+                    requests_args[k] = v
+
+            req = func(url, **requests_args)
         except requests.exceptions.RequestException as e:
             raise HTTPRequestException(e.message)
 
@@ -161,6 +170,7 @@ class MailSnake(object):
             return self.call(method_name.replace('_', '-'), params)
 
         return get.__get__(self)
+
 
 def flatten_data(data, parent_key=''):
     items = []

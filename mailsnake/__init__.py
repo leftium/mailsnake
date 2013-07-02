@@ -1,14 +1,12 @@
-from .mailsnake import *
+"""
+MailSnake
+---------
+
+MailSnake is a Python wrapper for the MailSnake API v1.3
+"""
 
 __author__ = 'John-Kim Murphy'
-__credits__ = [
-    'John-Kim Murphy',
-    'Michael Helmick',
-    'Brad Pitcher',
-    'vlinhart',
-    'starenka',
-    'Ryan Tucker'
-]
-__version__ = '1.6.1'
+__version__ = '2.0.0'
 
-__all__ = ['MailSnake']
+from .api import MailSnake
+from .exceptions import *
