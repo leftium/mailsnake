@@ -122,15 +122,13 @@ class MailSnake(object):
             data = params
 
         try:
-            func = getattr(self.client, method)
-
             requests_args = {}
             for k, v in self.requests_opts.items():
                 # Maybe this should be set as a class variable and only done once?
                 if k in ('timeout', 'allow_redirects', 'stream', 'verify'):
                     requests_args[k] = v
 
-            req = func(url, **requests_args)
+            req = self.client.post(url, **requests_args)
         except requests.exceptions.RequestException as e:
             raise HTTPRequestException(e.message)
 
