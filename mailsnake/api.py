@@ -13,6 +13,7 @@ dealing with the Twitter API
 import requests
 from .compat import json, basestring
 
+from . import __version__
 from .exceptions import *
 
 import collections
