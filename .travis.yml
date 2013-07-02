@@ -16,6 +16,10 @@ env:
       26UppoJguiPcuyPX1x0+jWrmX/rViDBTT1ttqH9cestKtBE7NojS/X5jblMX
       ZZngwgChHM85/H+CCN5A8IQQ3Ry5BGCFtyE7aJGhCt3M55i0m6SMa/XP3Rh+
       T1b4CnGi+wGbcxMD232SF5P9nJMRdgsLOyC7/8SVEKB5hbUOgiQ=
+  - secure: |-
+      faFGRraTG802mThDPSs4p2uoESKZ7lvahJD0mnqoB508cWq8ENhFocu+YTxP
+      S8F7Z314sSdVucLI7HP1XD1dabGlGpbKUBC3p62iKKcUsO9Xen6dfN52FDkS
+      0dQR36zvYGRTCSBRjCbGcMJ5oJuoOSQx2qDNp39Nj5idxnmUGZA=
 install: pip install -r requirements.txt
 script: nosetests -v -w tests/ --logging-filter="mailsnake" --with-cov --cov mailsnake --cov-config .coveragerc --cov-report term-missing
 notifications:
