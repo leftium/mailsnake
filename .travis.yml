@@ -4,11 +4,11 @@ python:
   - 2.7
 env: 
   global: 
-  - MAILCHIMP_API_KEY=
-  - MAILCHIMP_LIST_ID=
-  - TEST_EMAIL=
+  - MAILCHIMP_API_KEY=false
+  - MAILCHIMP_LIST_ID=false
+  - TEST_EMAIL=false
 install: pip install -r requirements.txt
-script: nosetests -v -w tests/ --logging-filter="mailsnake" --with-cov --cov twython --cov-config .coveragerc --cov-report term-missing
+script: nosetests -v -w tests/ --logging-filter="mailsnake" --with-cov --cov mailsnake --cov-config .coveragerc --cov-report term-missing
 notifications:
   email: false
 branches:
