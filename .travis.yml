@@ -4,9 +4,18 @@ python:
   - 2.7
 env: 
   global: 
-  - MAILCHIMP_API_KEY=false
-  - MAILCHIMP_LIST_ID=false
-  - TEST_EMAIL=false
+  - secure: |-
+      iYEe6mMWrJbx4IhV8qFIpPCCGgaF++tH0BZEXIkmlTQ5aA0GzdMfO/rLMzlc
+      /WJNd5oW+JeoLQqSqr7L/1MJlY8rKwAepIWeR747GMOZqgLr5MQgZYCuQuBy
+      0RQqc02lwfHt7+v7gDjU7q9/3Doftan3EIo3nHO9RLmHEZf5z2M=
+  - secure: |-
+      lJFqR4VUmFg91Gc7nDEKx9wEfxh4eNMM36iMgOQtK4IJo/J3UG9IUkiGknpM
+      pdDvdVVvOi/Vx4uPtntsTINHMNu2PiRLkE8t139aMA7TpCdZxyyBZHV8Kmcv
+      iIwUHUx+fury6ulrPDckT41O94tY6qWGEVgr3lyDBk9BnfCObfE=
+  - secure: |-
+      26UppoJguiPcuyPX1x0+jWrmX/rViDBTT1ttqH9cestKtBE7NojS/X5jblMX
+      ZZngwgChHM85/H+CCN5A8IQQ3Ry5BGCFtyE7aJGhCt3M55i0m6SMa/XP3Rh+
+      T1b4CnGi+wGbcxMD232SF5P9nJMRdgsLOyC7/8SVEKB5hbUOgiQ=
 install: pip install -r requirements.txt
 script: nosetests -v -w tests/ --logging-filter="mailsnake" --with-cov --cov mailsnake --cov-config .coveragerc --cov-report term-missing
 notifications:
