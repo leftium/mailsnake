@@ -1,6 +1,13 @@
 MailSnake
 =========
 
+.. image:: https://badge.fury.io/py/mailsnake.png
+        :target: http://badge.fury.io/py/mailsnake
+.. image:: https://travis-ci.org/michaelhelmick/python-mailsnake.png?branch=master
+        :target: https://travis-ci.org/michaelhelmick/python-mailsnake
+.. image:: https://pypip.in/d/mailsnake/badge.png
+        :target: https://crate.io/packages/mailsnake/
+
 ``MailSnake`` is a Python wrapper for `MailChimp API 1.3 <http://www.mailchimp.com/api/1.3/>`_ (as well as the `STS API <http://apidocs.mailchimp.com/sts/1.0/>`_, `Export API <http://apidocs.mailchimp.com/export/>`_, and `Mandrill API <http://mandrillapp.com/api/docs/>`_) (Now with support for Python 3)
 
 Installation
