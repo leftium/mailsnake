@@ -128,13 +128,14 @@ class MailSnake(object):
                 if k in ('timeout', 'allow_redirects', 'stream', 'verify'):
                     requests_args[k] = v
 
-            req = self.client.post(url, **requests_args)
+            req = self.client.post(url, data=data, **requests_args)
         except requests.exceptions.RequestException as e:
             raise HTTPRequestException(e.message)
 
         if req.status_code != 200:
             raise HTTPRequestException(req.status_code)
 
+        self.stream = False
         try:
             if self.stream:
                 def stream():

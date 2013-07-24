@@ -5,3 +5,5 @@ dist/
 *~
 *.geany
 secret_keys.py
+
+.env
