@@ -27,13 +27,14 @@ class MailSnake(object):
         requests are made, supply a dictionary for requests_opts. This will
         be passed through to requests.post() as kwargs.
         """
-        self.apikey = apikey
 
         ACCEPTED_APIS = ('api', 'sts', 'export', 'mandrill')
         if not api in ACCEPTED_APIS:
             raise MailSnakeException('The API "%s" is not supported.') % api
 
         self.api = api
+        self.apikey = apikey
+        self.dc = self.apikey.split('-')[1] if '-' in self.apikey else dc
 
         self.default_params = {'apikey': apikey}
         extra_params = extra_params or {}
@@ -49,10 +50,6 @@ class MailSnake(object):
                                                api, x))
         self.default_params.update(extra_params)
 
-        if dc:
-            self.dc = dc
-        elif '-' in self.apikey:
-            self.dc = self.apikey.split('-')[1]
         api_info = {
             'api': (self.dc, '.api.', 'mailchimp', '1.3/?method='),
             'sts': (self.dc, '.sts.', 'mailchimp', '1.0/'),
@@ -135,22 +132,21 @@ class MailSnake(object):
         if req.status_code != 200:
             raise HTTPRequestException(req.status_code)
 
-        self.stream = False
-        try:
-            if self.stream:
-                def stream():
-                    for line in req.iter_lines():
-                        # Handle byte arrays in Python 3
-                        line = line.decode('utf-8')
-                        if line:
-                            yield json.loads(line)
-                rsp = stream
-            elif self.api == 'export' and req.text.find('\n') > -1:
-                rsp = [json.loads(i) for i in req.text.split('\n')[0:-1]]
-            else:
-                rsp = json.loads(req.text)
-        except ValueError as e:
-            raise ParseException(e.message)
+            try:
+                if 'stream' in requests_opts:
+                    def stream():
+                        for line in req.iter_lines():
+                            # Handle byte arrays in Python 3
+                            line = line.decode('utf-8')
+                            if line:
+                                yield json.loads(line)
+                    rsp = stream
+                elif self.api == 'export' and req.text.find('\n') > -1:
+                    rsp = [json.loads(i) for i in req.text.split('\n')[0:-1]]
+                else:
+                    rsp = json.loads(req.text)
+            except ValueError as e:
+                raise ParseException(e.message)
 
         types_ = int, bool, basestring, types.FunctionType
         if not isinstance(rsp, types_) and 'error' in rsp and 'code' in rsp:
