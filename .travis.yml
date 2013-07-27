@@ -1,0 +1,33 @@
+language: python
+python:
+  - 2.6
+  - 2.7
+env: 
+  global: 
+# MAILCHIMP_API_KEY
+  - secure: |-
+      snHmkspOZFgByMfQh6C966JOtkqsT5spgb5Frhps9jLZTOJPzEi/UxPSPdxQ
+      b1iSNn30lYgBVarGao5OW5iOAFea2iQurBtHtuyhOiWl+zwm6fuuD8ZHmW4R
+      QzdPsB5TOG9RfDC5W5+km5vNsXvFV9GhWwUoTJ0gKxJkW+WQLjE=
+# MAILCHIMP_LIST_ID
+  - secure: |-
+      GjWNYY0kSA5YQXdvymWcUQA8F0uNGLiwl06htyEbY/hG0DrdfJYzYNvos/CS
+      8JgdIwvSopXmQaalOEjUxL6yAupZqRgeIzyR/VZY521/Wl9ZKaoTBnufJCH1
+      wuGQdb49Cg/VkQ+LlO3+02S3qOq1x8Zf4572NVEriomKt8wP9nI=
+# TEST_RECIPIENT_EMAIL
+  - secure: |-
+      e3dE5DwzjvpEhLu2nO7pOIBstBe0ahS+Ugy6tzPX8kIlSLjzNIPg3GWokdw3
+      rwOuyWd/iqkHOIUWPX4XrVzU08S90tMStHfbfswCnWG46+XuW9FHq7B/MpPJ
+      v0ePdq/BNIO2vMX5O6Ku+F/d6LWRFJkLcft9d14nV1960iVkeVA=
+# MANDRILL_API_KEY
+  - secure: |-
+      KSME137xMK3VLxEpBbKoEpdUUUFlwnQglRM7hoxLgGjksQh5V++HclpvAXoq
+      hQ9arqmgt62Tv8W5m2vpHxoH7az6ErSP2JqykNynkoNfr8elFithBb93i9PP
+      4CrSvdCV05vcDm5BRUZ2OqA2/t//DPpOxdO4emxTXMfeOz2KDTs=
+install: pip install -r requirements.txt
+script: nosetests -v -w tests/ --logging-filter="mailsnake" --with-cov --cov mailsnake --cov-config .coveragerc --cov-report term-missing
+notifications:
+  email: false
+branches:
+  only:
+    - master
