@@ -125,7 +125,13 @@ class MailSnake(object):
             raise HTTPRequestException(e.message)
 
         if req.status_code != 200:
-            raise HTTPRequestException(req.status_code)
+            raise HTTPRequestException(json.dumps({
+                'status_code': req.status_code,
+                'reason': req.reason,
+                'url': url,
+                'params': flatten_data(data),
+                'options': self.requests_opts,
+            }))
 
         try:
             if self.stream:
