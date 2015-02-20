@@ -129,8 +129,6 @@ class MailSnake(object):
                 'status_code': req.status_code,
                 'reason': req.reason,
                 'url': url,
-                'params': flatten_data(data),
-                'options': self.requests_opts,
             }))
 
         try:

@@ -13,7 +13,7 @@ elif _ver[0] == 3:
 
 setup(
     name='mailsnake',
-    version='1.6.2',
+    version='1.6.3',
     description='MailChimp API v1.3, STS, Export, Mandrill wrapper for Python.',
     long_description=open('README.rst').read(),
     author='John-Kim Murphy',
