@@ -1,21 +1,10 @@
 """ MailSnake """
 import collections
+import json
+
 import requests
 import types
 from requests.compat import basestring
-
-try:
-    import simplejson as json
-except ImportError:
-    try:
-        import json
-    except ImportError:
-        try:
-            from django.utils import simplejson as json
-        except ImportError:
-            raise ImportError('A json library is required to use ' + \
-                             'this python library. Lol, yay for ' + \
-                             'being verbose. ;)')
 
 from .exceptions import *
 
